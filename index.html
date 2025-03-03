@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Vítimas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #E6E6FA; /* Lilás claro */
+            color: #4B0082; /* Índigo */
+            padding: 20px;
+        }
+        h1 {
+            color: #800080; /* Roxo */
+        }
+        #searchBox {
+            padding: 10px;
+            width: 300px;
+            border: 2px solid #9370DB; /* Lilás médio */
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #searchButton {
+            padding: 10px 20px;
+            background-color: #9370DB; /* Lilás médio */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #searchButton:hover {
+            background-color: #800080; /* Roxo */
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #D8BFD8; /* Lilás claro */
+            border: 2px solid #9370DB; /* Lilás médio */
+            border-radius: 5px;
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #9370DB; /* Lilás médio */
+            text-align: left;
+        }
+        th {
+            background-color: #9370DB; /* Lilás médio */
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Busca de Vítimas</h1>
+    <input type="text" id="searchBox" placeholder="Digite o nome da vítima">
+    <button id="searchButton">Buscar</button>
+
+    <div id="result">
+        <h2>Resultado da Busca</h2>
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th>N° Processo</th>
+                    <th>Chave</th>
+                    <th>Ocorrência</th>
+                    <th>Nome da Vítima</th>
+                    <th>Data de Nascimento</th>
+                    <th>RG/CPF</th>
+                    <th>Nome do Agressor</th>
+                    <th>Data de Nascimento</th>
+                    <th>RG/CPF</th>
+                    <th>Início Prazo</th>
+                    <th>Fim Prazo</th>
+                    <th>Início Prorrogação</th>
+                    <th>Fim Prorrogação</th>
+                    <th>Endereço da Vítima</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dados serão inseridos aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const data = [
+            {
+                "N° PROCESSO": "5000554-19.2024.8.21.0139",
+                "CHAVE": "383809734626",
+                "OCORRÊNCIA": "983393/2024/1057",
+                "NOME DA VÍTIMA": "ELIANE MILK DA ROSA",
+                "DATA DE NASCIMENTO": "1978-12-05 00:00:00",
+                "RG/CPF": "6100234308",
+                "NOME DO AGRESSOR": "LUIZ CARLOS BOEIRA RODRIGUES",
+                "DATA DE NASCIMENTO": "15/07/68",
+                "RG/CPF": "7038767245",
+                "INÍCIO PRAZO": "19/02/24",
+                "FIM PRAZO": "19/05/24",
+                "INÍCIO PRORROGAÇÃO": "",
+                "FIM PRORROGAÇÃO": "",
+                "ENDEREÇO DA VÍTIMA": ""
+            },
+            {
+                "N° PROCESSO": "5000427-81.2024.8.21.0139",
+                "CHAVE": "SEM CHAVE",
+                "OCORRÊNCIA": "153316/2024/0697",
+                "NOME DA VÍTIMA": "GRIZIANE NUNES DOS SANTOS CIEPLAK",
+                "DATA DE NASCIMENTO": "1985-12-04 00:00:00",
+                "RG/CPF": "1091032126",
+                "NOME DO AGRESSOR": "JEVERSON DA SILVA CIEPLAK",
+                "DATA DE NASCIMENTO": "1982-04-09 00:00:00",
+                "RG/CPF": "4084490971",
+                "INÍCIO PRAZO": "2024-03-02 00:00:00",
+                "FIM PRAZO": "2024-02-05 00:00:00",
+                "INÍCIO PRORROGAÇÃO": "",
+                "FIM PRORROGAÇÃO": "",
+                "ENDEREÇO DA VÍTIMA": ""
+            },
+            {
+                "N° PROCESSO": "5000572-40.2024.8.21.0139",
+                "CHAVE": "107401442126",
+                "OCORRÊNCIA": "153316/2024/1094",
+                "NOME DA VÍTIMA": "ANDRESSA DOS SANTOS RODRIGUES",
+                "DATA DE NASCIMENTO": "1996-01-01 00:00:00",
+                "RG/CPF": "1122127341",
+                "NOME DO AGRESSOR": "DIEGO DA SILVA",
+                "DATA DE NASCIMENTO": "1992-06-09 00:00:00",
+                "RG/CPF": "4125780736",
+                "INÍCIO PRAZO": "20/02/24",
+                "FIM PRAZO": "20/08/24",
+                "INÍCIO PRORROGAÇÃO": "",
+                "FIM PRORROGAÇÃO": "",
+                "ENDEREÇO DA VÍTIMA": ""
+            },
+            {
+                "N° PROCESSO": "5001038-34.2024.8.21.0139",
+                "CHAVE": "903280180528",
+                "OCORRÊNCIA": "983016/2024/1656",
+                "NOME DA VÍTIMA": "KAUANE RHUANDA DE SOUZA LEAL",
+                "DATA DE NASCIMENTO": "16/07/04",
+                "RG/CPF": "8137620376",
+                "NOME DO AGRESSOR": "GIAN PEREIRA DA SILVA",
+                "DATA DE NASCIMENTO": "16/11/01",
+                "RG/CPF": "8126058257",
+                "INÍCIO PRAZO": "2024-07-04 00:00:00",
+                "FIM PRAZO": "2024-07-07 00:00:00",
+                "INÍCIO PRORROGAÇÃO": "",
+                "FIM PRORROGAÇÃO": "",
+                "ENDEREÇO DA VÍTIMA": ""
+            },
+            {
+                "N° PROCESSO": "5000286-96.2023.8.21.0139",
+                "CHAVE": "SEM CHAVE",
+                "OCORRÊNCIA": "983016-2024-1655",
+                "NOME DA VÍTIMA": "VERA LUCIA DOS SANTOS",
+                "DATA DE NASCIMENTO": "1958-03-08 00:00:00",
+                "RG/CPF": "7037281982",
+                "NOME DO AGRESSOR": "ROQUE FERNANDES VIANA",
+                "DATA DE NASCIMENTO": "25/04/70",
+                "RG/CPF": "9046822681",
+                "INÍCIO PRAZO": "2023-12-05 00:00:00",
+                "FIM PRAZO": "2024-12-05 00:00:00",
+                "INÍCIO PRORROGAÇÃO": "",
+                "FIM PRORROGAÇÃO": "",
+                "ENDEREÇO DA VÍTIMA": ""
+            }
+        ];
+
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const searchTerm = document.getElementById('searchBox').value.toUpperCase();
+            const results = data.filter(item => item['NOME DA VÍTIMA'].toUpperCase().includes(searchTerm));
+
+            const resultDiv = document.getElementById('result');
+            const tbody = document.querySelector('#resultTable tbody');
+
+            tbody.innerHTML = ''; // Limpa os resultados anteriores
+
+            if (results.length > 0) {
+                results.forEach(result => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${result['N° PROCESSO']}</td>
+                            <td>${result['CHAVE']}</td>
+                            <td>${result['OCORRÊNCIA']}</td>
+                            <td>${result['NOME DA VÍTIMA']}</td>
+                            <td>${result['DATA DE NASCIMENTO']}</td>
+                            <td>${result['RG/CPF']}</td>
+                            <td>${result['NOME DO AGRESSOR']}</td>
+                            <td>${result['DATA DE NASCIMENTO']}</td>
+                            <td>${result['RG/CPF']}</td>
+                            <td>${result['INÍCIO PRAZO']}</td>
+                            <td>${result['FIM PRAZO']}</td>
+                            <td>${result['INÍCIO PRORROGAÇÃO']}</td>
+                            <td>${result['FIM PRORROGAÇÃO']}</td>
+                            <td>${result['ENDEREÇO DA VÍTIMA']}</td>
+                        </tr>
+                    `;
+                });
+                resultDiv.style.display = 'block';
+            } else {
+                tbody.innerHTML = '<tr><td colspan="14">Nenhum resultado encontrado.</td></tr>';
+                resultDiv.style.display = 'block';
+            }
+
+            document.getElementById('searchBox').value = ''; // Limpa o campo de busca
+        });
+    </script>
+</body>
+</html>
