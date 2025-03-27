@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Vítimas | Sistema PMP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6a1b9a;
+            --secondary-color: #9c27b0;
+            --accent-color: #ff9800;
+            --light-color: #f3e5f5;
+            --dark-color: #4a148c;
+            --text-color: #333;
+            --light-text: #f8f9fa;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --warning-color: #ffc107;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9f9f9;
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--accent-color);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .last-sync {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-header h2 {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .search-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #searchBox {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        #searchBox:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.2);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--light-color);
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .indicators {
+            margin-top: 15px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .alert-error {
+            background-color: #ffebee;
+            color: var(--error-color);
+        }
+
+        .alert i {
+            font-size: 20px;
+        }
+
+        #result {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .result-header h2 {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .result-count {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: var(--light-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 50px;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h3 {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .debug-toggle {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        #debugInfo {
+            background-color: #f5f5f5;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Busca de Vítimas</h1>
+            </div>
+            <div class="last-sync" id="lastSyncTime">
+                <i class="fas fa-sync-alt"></i> Última sincronização: nunca
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="search-container">
+            <div class="search-header">
+                <h2><i class="fas fa-search"></i> Pesquisar Vítimas</h2>
+                <div class="search-actions">
+                    <button id="syncButton" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i> Sincronizar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="searchBox" placeholder="Digite o nome da vítima...">
+                <button id="searchButton" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+            
+            <div class="indicators">
+                <div id="loadingIndicator" class="alert alert-info">
+                    <i class="fas fa-spinner spinner"></i> Carregando dados...
+                </div>
+                <div id="syncIndicator" class="alert alert-info">
+                    <i class="fas fa-spinner spinner"></i> Sincronizando dados...
+                </div>
+                <div id="errorMessage" class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i> Erro ao carregar dados.
+                </div>
+            </div>
+        </section>
+
+        <section id="result" class="fade-in">
+            <div class="result-header">
+                <h2><i class="fas fa-list-alt"></i> Resultados da Busca</h2>
+                <span class="result-count" id="resultCount">0 resultados</span>
+            </div>
+            
+            <div class="table-responsive">
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>N° Processo</th>
+                            <th>Chave</th>
+                            <th>Ocorrência</th>
+                            <th>Nome da Vítima</th>
+                            <th>Data Nasc.</th>
+                            <th>RG/CPF</th>
+                            <th>Nome do Agressor</th>
+                            <th>Data Nasc.</th>
+                            <th>RG/CPF</th>
+                            <th>Início Prazo</th>
+                            <th>Fim Prazo</th>
+                            <th>Prorrogação</th>
+                            <th>Endereço</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="emptyState" class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>Nenhum resultado encontrado</h3>
+                <p>Realize uma nova busca ou verifique os critérios de pesquisa</p>
+            </div>
+        </section>
+        
+        <div class="debug-toggle">
+            <button id="toggleDebug" class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">
+                <i class="fas fa-bug"></i> Debug
+            </button>
+        </div>
+        <div id="debugInfo"></div>
+    </main>
+
+    <script>
+        // GitHub raw file URL
+        const DATA_URL = 'https://raw.githubusercontent.com/Vinros94/PMP/main/dados.json';
+
+        let victimData = []; // Global variable to store fetched data
+
+        // Function to fetch data from GitHub
+        async function fetchVictimData(isManualSync = false) {
+            const loadingIndicator = isManualSync 
+                ? document.getElementById('syncIndicator') 
+                : document.getElementById('loadingIndicator');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultDiv = document.getElementById('result');
+            const lastSyncTime = document.getElementById('lastSyncTime');
+            const debugInfo = document.getElementById('debugInfo');
+
+            try {
+                loadingIndicator.style.display = 'flex';
+                resultDiv.style.display = 'none';
+                errorMessage.style.display = 'none';
+                debugInfo.textContent = 'Iniciando busca de dados...';
+
+                // Add cache busting to ensure fresh data
+                const url = DATA_URL + '?t=' + new Date().getTime();
+                debugInfo.textContent += `\nURL: ${url}`;
+
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const rawData = await response.text();
+                
+                // Log raw data for debugging
+                debugInfo.textContent += `\n\nRaw Data (first 200 chars): ${rawData.substring(0, 200)}...`;
+
+                // Try parsing the data
+                try {
+                    victimData = JSON.parse(rawData);
+                    
+                    // Ensure victimData is an array
+                    if (!Array.isArray(victimData)) {
+                        throw new Error('Os dados não estão no formato esperado (array de objetos)');
+                    }
+
+                    debugInfo.textContent += `\n\nDados parseados com sucesso. Número de registros: ${victimData.length}`;
+                    
+                    if (victimData.length > 0) {
+                        debugInfo.textContent += `\n\nPrimeiro registro: ${JSON.stringify(victimData[0], null, 2)}`;
+                    }
+                } catch (parseError) {
+                    throw new Error(`Erro ao analisar JSON: ${parseError.message}`);
+                }
+
+                loadingIndicator.style.display = 'none';
+
+                // Update last sync time
+                const now = new Date();
+                lastSyncTime.innerHTML = `<i class="fas fa-sync-alt"></i> Última sincronização: ${now.toLocaleString()}`;
+                
+                // Show success message for manual sync
+                if (isManualSync) {
+                    showAlert('Dados sincronizados com sucesso!', 'success');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                loadingIndicator.style.display = 'none';
+                errorMessage.style.display = 'flex';
+                errorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> Erro ao carregar dados: ${error.message}`;
+                
+                // Log detailed error information
+                debugInfo.textContent += `\n\nError: ${error.stack || error.message}`;
+                victimData = []; // Reset data on error
+            }
+        }
+
+        // Function to show alert message
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            const indicators = document.querySelector('.indicators');
+            indicators.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Function to format date (remove time part if exists)
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            // If date includes time (T00:00:00), remove it
+            return dateString.includes('T') ? dateString.split('T')[0] : dateString;
+        }
+
+        // Function to format prorrogation dates
+        function formatProrrogation(inicio, fim) {
+            if (!inicio && !fim) return '-';
+            return `${formatDate(inicio)} a ${formatDate(fim)}`;
+        }
+
+        // Initial data fetch when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchVictimData();
+            
+            // Set up debug toggle
+            document.getElementById('toggleDebug').addEventListener('click', () => {
+                const debugInfo = document.getElementById('debugInfo');
+                debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+
+        // Add event listener for sync button
+        document.getElementById('syncButton').addEventListener('click', () => {
+            fetchVictimData(true);
+        });
+
+        document.getElementById('searchButton').addEventListener('click', function() {
+            // Check if victimData is empty or not an array
+            if (!Array.isArray(victimData) || victimData.length === 0) {
+                showAlert('Dados não carregados. Por favor, sincronize.', 'error');
+                return;
+            }
+
+            const searchTerm = document.getElementById('searchBox').value.trim().toUpperCase();
+            if (searchTerm === '') {
+                showAlert('Por favor, digite um nome para buscar', 'error');
+                return;
+            }
+
+            const results = victimData.filter(item => {
+                const victimName = item['NOME DA VÍTIMA'] || '';
+                return victimName.toUpperCase().includes(searchTerm);
+            });
+
+            const resultDiv = document.getElementById('result');
+            const tbody = document.querySelector('#resultTable tbody');
+            const emptyState = document.getElementById('emptyState');
+            const resultCount = document.getElementById('resultCount');
+
+            tbody.innerHTML = ''; // Limpa os resultados anteriores
+            resultCount.textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''}`;
+
+            if (results.length > 0) {
+                emptyState.style.display = 'none';
+                results.forEach(result => {
+                    const row = document.createElement('tr');
+                    
+                    // Helper function to create table cells
+                    function createCell(value) {
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        return td;
+                    }
+
+                    row.appendChild(createCell(result['N° PROCESSO'] || '-'));
+                    row.appendChild(createCell(result['CHAVE'] || '-'));
+                    row.appendChild(createCell(result['OCORRÊNCIA'] || '-'));
+                    row.appendChild(createCell(result['NOME DA VÍTIMA'] || '-'));
+                    row.appendChild(createCell(formatDate(result['DATA DE NASCIMENTO DA VÍTIMA'] || '-')));
+                    row.appendChild(createCell(result['RG/CPF DA VÍTIMA'] || '-'));
+                    row.appendChild(createCell(result['NOME DO AGRESSOR'] || '-'));
+                    row.appendChild(createCell(formatDate(result['DATA DE NASCIMENTO DO AGRESSOR'] || '-')));
+                    row.appendChild(createCell(result['RG/CPF DO AGRESSOR'] || '-'));
+                    row.appendChild(createCell(formatDate(result['INÍCIO PRAZO'] || '-')));
+                    row.appendChild(createCell(formatDate(result['FIM PRAZO'] || '-')));
+                    row.appendChild(createCell(formatProrrogation(result['INÍCIO PRORROGAÇÃO'], result['FIM PRORROGAÇÃO'])));
+                    row.appendChild(createCell(result['ENDEREÇO DA VÍTIMA'] || '-'));
+
+                    tbody.appendChild(row);
+                });
+                resultDiv.style.display = 'block';
+            } else {
+                emptyState.style.display = 'block';
+                resultDiv.style.display = 'block';
+            }
+        });
+
+        // Allow search on Enter key
+        document.getElementById('searchBox').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchButton').click();
+            }
+        });
+    </script>
+</body>
+</html>
