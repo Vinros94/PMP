@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Police Bulletin Analysis Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        #result h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        .section {
+            margin-bottom: 15px;
+        }
+        .section label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Police Bulletin Analysis Bot</h1>
+    <div class="container">
+        <form id="bulletinForm">
+            <label for="bulletinText">Enter Bulletin Text:</label>
+            <textarea id="bulletinText" placeholder="Paste the police bulletin text here..." required></textarea>
+            <button type="submit">Analyze Bulletin</button>
+        </form>
+        <div id="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Police operations data (same as provided)
+        const operacoesPoliciais = {
+            "CERCO FECHADO": {
+                palavrasChave: [
+                    "cerco fechado", "crimes violentos letais intencionais", "CVLI", "roubo a pedestre",
+                    "Ordem de Serviço nº 016/CRPO-VC/P-3/2025", "Ordem de Serviço nº 0009/SCmt-G/2025"
+                ],
+                acoes: [
+                    "patrulhamento ostensivo", "posto-base", "fiscalização de trânsito",
+                    "abordagem de veículos", "identificação de pessoas", "giroflash ligado"
+                ],
+                objetivos: [
+                    "combater os índices de Crimes Violentos Letais Intencionais",
+                    "combater roubo a pedestre", "maximizar a visibilidade e presença policial",
+                    "transmitir percepção de segurança"
+                ]
+            },
+            "ABRIL VERMELHO": {
+                palavrasChave: [
+                    "abril vermelho", "ocupações de terras", "assentamentos",
+                    "Ordem de Serviço nº 026/CRPO-VC/P-3/2025", "Ordem De Serviço nº 0163/SCmt-G/2025"
+                ],
+                acoes: [
+                    "policiamento ostensivo", "intensificação da presença policial", "giroflash ligado"
+                ],
+                objetivos: [
+                    "prevenir e reprimir ocupações de terras", "intensificar presença nas áreas de assentamentos",
+                    "maximizar a visibilidade e presença policial", "transmitir percepção de segurança"
+                ]
+            },
+            "PRODUTIVIDADE": {
+                palavrasChave: [
+                    "produtividade", "índices de criminalidade", "barreira de trânsito",
+                    "Ordem De Serviço N.º 013/5º BPM-P3/2025"
+                ],
+                acoes: [
+                    "barreira de trânsito", "abordagens", "fiscalizações", "confecção de autos de infração",
+                    "giroflash ligado"
+                ],
+                objetivos: [
+                    "reduzir os índices de criminalidade", "combater CVLI", "combater tráfico de drogas",
+                    "combater porte ilegal de armas", "capturar foragidos/procurados", "combater jogos de azar",
+                    "prevenir crimes", "fiscalizar infrações de trânsito"
+                ]
+            },
+            "VOLTA ÀS AULAS": {
+                palavrasChave: [
+                    "volta às aulas", "escolar", "estabelecimentos de ensino",
+                    "Ordem de Serviço N.º 005/5ºBPM-P3/2025", "O Sv nº 013/CRPO-VC/P-3/2025",
+                    "O Sv nº 0065/SCmt-G/2025"
+                ],
+                acoes: [
+                    "policiamento nas escolas", "ações de polícia ostensiva", "preservação da ordem pública",
+                    "posto-base/patrulhamento preventivo", "giroflash ligado"
+                ],
+                objetivos: [
+                    "segurança nas escolas", "intervenção policial sistemática", "reduzir problemas relacionados ao trânsito",
+                    "reduzir ocorrências policiais no entorno", "maximizar a visibilidade e presença policial",
+                    "transmitir percepção de segurança"
+                ]
+            },
+            "ESCOLA SEGURA": {
+                palavrasChave: [
+                    "escola segura", "fecha quartel", "estabelecimentos de ensino",
+                    "Ordem De Serviço N.º 015/5º BPM-P3/2025", "O Sv n.º 0181/Scmt-G/2025"
+                ],
+                acoes: [
+                    "ações coordenadas", "ações articuladas", "operação policial qualificada",
+                    "posto-base/patrulhamento preventivo", "giroflash ligado"
+                ],
+                objetivos: [
+                    "promover a segurança nos estabelecimentos de ensino", "metodologia de gestão por resultados",
+                    "análise criminal e inteligência", "inibir ações criminosas contra estabelecimentos de ensino",
+                    "proteger estudantes e profissionais", "combater o medo causado pela violência potencial",
+                    "maximizar a visibilidade e presença policial", "transmitir percepção de segurança"
+                ]
+            },
+            "INTEGRADA": {
+                palavrasChave: [
+                    "operação integrada", "fiscalização em bares", "fiscalização em boates",
+                    "casas noturnas", "prostíbulos", "Ordem de Serviço nº 024/CRPO-VC/P-3/2025",
+                    "Ordem De Serviço nº 0154/SCmt-G/2025"
+                ],
+                acoes: [
+                    "fiscalização em bares", "fiscalização em boates", "fiscalização em casas noturnas",
+                    "fiscalização em prostíbulos", "identificação de crianças e adolescentes",
+                    "combate ao tráfico de drogas", "captura de foragidos", "lançamento de dados no MCOP"
+                ],
+                objetivos: [
+                    "inibir a utilização de comércio por Organizações Criminosas",
+                    "identificar presença de crianças e adolescentes", "combater tráfico de drogas",
+                    "capturar foragidos"
+                ]
+            },
+            "FECHA QUARTEL": {
+                palavrasChave: [
+                    "fecha quartel", "conflitos entre organizações criminosas",
+                    "Ordem de Serviço nº 027/CRPO-VC/P3/2024", "RJG-OSv nº 0164/SCmt-G/2025"
+                ],
+                acoes: [
+                    "policiamento preventivo", "policiamento repressivo", "ações de saturação de área",
+                    "barreiras policiais", "fiscalização de estabelecimentos comerciais",
+                    "lançamento de dados no MCOP"
+                ],
+                objetivos: [
+                    "coibir conflitos entre organizações criminosas", "intensificar operações policiais em áreas conflagradas",
+                    "combater tráfico de drogas", "reduzir incidência de homicídios", "combater índices de CVLI"
+                ]
+            },
+            "ELO DE PROTEÇÃO": {
+                palavrasChave: [
+                    "elo de proteção", "violência doméstica", "patrulha maria da penha",
+                    "Ordem de Serviço nº 018/CRPO-VC/P-3/2025", "ORDEM DE SERVIÇO nº 0105/Scmt-G/2025"
+                ],
+                acoes: [
+                    "lançamento dos dados no MCOP e BM MOB", "ações da Patrulha Maria da Penha"
+                ],
+                objetivos: [
+                    "combate romant à violência doméstica", "ênfase nas ações da Patrulha Maria da Penha"
+                ]
+            }
+        };
+
+        // analisarTexto function
+        function analisarTexto(texto) {
+            if (!texto || typeof texto !== 'string') {
+                return {
+                    sucesso: false,
+                    mensagem: 'Texto inválido para análise'
+                };
+            }
+
+            const textoNormalizado = texto.toLowerCase();
+            let operacaoIdentificada = null;
+            let pontuacaoMaxima = 0;
+            let acoesEncontradas = [];
+            let objetivosEncontrados = [];
+            let palavrasChaveEncontradas = [];
+
+            for (const [nomeOperacao, operacao] of Object.entries(operacoesPoliciais)) {
+                let pontuacao = 0;
+                const palavrasChaveDetectadas = [];
+                const acoesDetectadas = [];
+                const objetivosDetectados = [];
+
+                for (const palavraChave of operacao.palavrasChave) {
+                    if (textoNormalizado.includes(palavraChave.toLowerCase())) {
+                        pontuacao += 3;
+                        palavrasChaveDetectadas.push(palavraChave);
+                    }
+                }
+
+                for (const acao of operacao.acoes) {
+                    if (textoNormalizado.includes(acao.toLowerCase())) {
+                        pontuacao += 1;
+                        acoesDetectadas.push(acao);
+                    }
+                }
+
+                for (const objetivo of operacao.objetivos) {
+                    if (textoNormalizado.includes(objetivo.toLowerCase())) {
+                        pontuacao += 2;
+                        objetivosDetectados.push(objetivo);
+                    }
+                }
+
+                if (pontuacao > pontuacaoMaxima) {
+                    pontuacaoMaxima = pontuacao;
+                    operacaoIdentificada = nomeOperacao;
+                    acoesEncontradas = acoesDetectadas;
+                    objetivosEncontrados = objetivosDetectados;
+                    palavrasChaveEncontradas = palavrasChaveDetectadas;
+                }
+            }
+
+            let confianca = 'BAIXA';
+            if (pontuacaoMaxima >= 10) {
+                confianca = 'ALTA';
+            } else if (pontuacaoMaxima >= 5) {
+                confianca = 'MÉDIA';
+            }
+
+            return {
+                sucesso: pontuacaoMaxima > 0,
+                operacao: operacaoIdentificada,
+                confianca: confianca,
+                pontuacao: pontuacaoMaxima,
+                palavrasChave: palavrasChaveEncontradas,
+                acoes: acoesEncontradas,
+                objetivos: objetivosEncontrados,
+                mensagem: pontuacaoMaxima > 0 
+                    ? `Identificada operação "${operacaoIdentificada}" com confiança ${confianca}`
+                    : 'Não foi possível identificar o tipo de operação policial no texto'
+            };
+        }
+
+        // extrairDadosAdicionais function
+        function extrairDadosAdicionais(texto) {
+            const dados = {
+                dataOperacao: null,
+                localOperacao: null,
+                numeroOrdemServico: null,
+                veiculosAbordados: null,
+                pessoasIdentificadas: null
+            };
+
+            const padraoData = /(\d{1,2})\s+de\s+([a-zç]+)\s+de\s+(\d{4})/gi;
+            const matchData = texto.match(padraoData);
+            if (matchData && matchData.length > 0) {
+                dados.dataOperacao = matchData[0];
+            }
+
+            const padraoLocal = /localidade\s+XX|na\s+área\s+de\s+ação\s+do\s+5º\s+BPM|localizada\s+em\s+XX/gi;
+            const matchLocal = texto.match(padraoLocal);
+            if (matchLocal && matchLocal.length > 0) {
+                dados.localOperacao = matchLocal[0].replace(/XX/g, "[LOCALIDADE]");
+            }
+
+            const padraoOrdemServico = /Ordem\s+[dD]e\s+Serviço\s+[nN][.º]\s+(\d+\/[A-Z0-9-]+\/\d+)/gi;
+            const matchOrdemServico = texto.match(padraoOrdemServico);
+            if (matchOrdemServico && matchOrdemServico.length > 0) {
+                dados.numeroOrdemServico = matchOrdemServico[0];
+            }
+
+            const padraoVeiculos = /abordados\s+e\s+fiscalizados\s+XX\s+veículos/i;
+            const matchVeiculos = texto.match(padraoVeiculos);
+            if (matchVeiculos) {
+                dados.veiculosAbordados = "XX [QUANTIDADE DE VEÍCULOS]";
+            }
+
+            const padraoPessoas = /identificadas\s+XX\s+pessoas/i;
+            const matchPessoas = texto.match(padraoPessoas);
+            if (matchPessoas) {
+                dados.pessoasIdentificadas = "XX [QUANTIDADE DE PESSOAS]";
+            }
+
+            return dados;
+        }
+
+        // verificarBoletim function
+        function verificarBoletim(textoBoletim) {
+            const resultadoAnalise = analisarTexto(textoBoletim);
+            const dadosAdicionais = extrairDadosAdicionais(textoBoletim);
+            
+            return {
+                ...resultadoAnalise,
+                dados: dadosAdicionais
+            };
+        }
+
+        // Form submission handler
+        document.getElementById('bulletinForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const bulletinText = document.getElementById('bulletinText').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!bulletinText.trim()) {
+                resultDiv.innerHTML = '<p class="error">Please enter a bulletin text.</p>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+
+            const result = verificarBoletim(bulletinText);
+            let html = '<h2>Analysis Result</h2>';
+
+            if (result.sucesso) {
+                html += `<p class="success">${result.mensagem}</p>`;
+                html += `<div class="section"><label>Operation:</label> ${result.operacao}</div>`;
+                html += `<div class="section"><label>Confidence Level:</label> ${result.confianca}</div>`;
+                html += `<div class="section"><label>Score:</label> ${result.pontuacao}</div>`;
+
+                html += '<div class="section"><label>Keywords Found:</label><ul>';
+                html += result.palavrasChave.length > 0 
+                    ? result.palavrasChave.map(kw => `<li>${kw}</li>`).join('')
+                    : '<li>None</li>';
+                html += '</ul></div>';
+
+                html += '<div class="section"><label>Actions Found:</label><ul>';
+                html += result.acoes.length > 0 
+                    ? result.acoes.map(acao => `<li>${acao}</li>`).join('')
+                    : '<li>None</li>';
+                html += '</ul></div>';
+
+                html += '<div class="section"><label>Objectives Found:</label><ul>';
+                html += result.objetivos.length > 0 
+                    ? result.objetivos.map(obj => `<li>${obj}</li>`).join('')
+                    : '<li>None</li>';
+                html += '</ul></div>';
+
+                html += '<div class="section"><label>Additional Data:</label><ul>';
+                html += result.dados.dataOperacao ? `<li>Date: ${result.dados.dataOperacao}</li>` : '';
+                html += result.dados.localOperacao ? `<li>Location: ${result.dados.localOperacao}</li>` : '';
+                html += result.dados.numeroOrdemServico ? `<li>Service Order: ${result.dados.numeroOrdemServico}</li>` : '';
+                html += result.dados.veiculosAbordados ? `<li>Vehicles Approached: ${result.dados.veiculosAbordados}</li>` : '';
+                html += result.dados.pessoasIdentificadas ? `<li>People Identified: ${result.dados.pessoasIdentificadas}</li>` : '';
+                html += result.dados.dataOperacao || result.dados.localOperacao || result.dados.numeroOrdemServico || 
+                        result.dados.veiculosAbordados || result.dados.pessoasIdentificadas ? '' : '<li>None</li>';
+                html += '</ul></div>';
+            } else {
+                html += `<p class="error">${result.mensagem}</p>`;
+            }
+
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
